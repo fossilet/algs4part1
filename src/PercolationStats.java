@@ -15,7 +15,9 @@ public class PercolationStats {
         while (!perc.percolates()) {
             x = StdRandom.uniform(1, N + 1);
             y = StdRandom.uniform(1, N + 1);
-            perc.open(x, y);
+            if (!perc.isOpen(x, y)) {
+                perc.open(x, y);
+            }
 //            System.out.printf("%d %d\n----\n", x, y);
         }
         // Calculate threshold.
