@@ -1,5 +1,6 @@
 /**
  * Percolation stats.
+ * http://coursera.cs.princeton.edu/algs4/assignments/percolation.html
  * Created by tux on 6/26/14.
  */
 
@@ -7,8 +8,19 @@ public class PercolationStats {
 
     private double[] fractions;
 
+    // perform T independent computational experiments on an N-by-N grid
+    public PercolationStats(int N, int T) {
+        if (N <= 0 || T <= 0) {
+            throw new IllegalArgumentException();
+        }
+        fractions = new double[T];
+        for (int i = 0; i < T; i++) {
+            fractions[i] = compute(N);
+        }
+    }
+
     // Perform one computational experiments on an N-by-N grid
-    private double Compute(int N) {
+    private double compute(int N) {
         int x;
         int y;
         Percolation perc = new Percolation(N);
@@ -21,29 +33,19 @@ public class PercolationStats {
 //            System.out.printf("%d %d\n----\n", x, y);
         }
         // Calculate threshold.
-        int open_num = 0;
+        int openNum = 0;
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
                 if (perc.isOpen(i + 1, j + 1)) {
-                    open_num += 1;
+                    openNum += 1;
                 }
             }
         }
         double frac;
-        frac = ((double) open_num) / (N * N);
+        frac = ((double) openNum) / (N * N);
         return frac;
     }
 
-    // perform T independent computational experiments on an N-by-N grid
-    public PercolationStats(int N, int T) throws IllegalArgumentException {
-        if (N <= 0 || T <= 0) {
-            throw new IllegalArgumentException();
-        }
-        fractions = new double[T];
-        for (int i = 0; i < T; i++) {
-            fractions[i] = Compute(N);
-        }
-    }
 
     // sample mean of percolation threshold
     public double mean() {
@@ -59,7 +61,7 @@ public class PercolationStats {
         double sum = 0;
         double m = mean();
         for (double fraction : fractions) {
-            sum += Math.pow(m - fraction, 2);
+            sum += (m - fraction)*(m - fraction);
         }
         return Math.pow(sum / (fractions.length - 1), 0.5);
     }
