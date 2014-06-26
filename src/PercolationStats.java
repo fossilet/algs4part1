@@ -6,8 +6,6 @@
 public class PercolationStats {
 
     private double[] fractions;
-    private double mean_val;
-    private double stddev_val;
 
     // Perform one computational experiments on an N-by-N grid
     private double Compute(int N) {
@@ -51,28 +49,31 @@ public class PercolationStats {
         for (double fraction : fractions) {
             sum += fraction;
         }
-        mean_val = sum / fractions.length;
-        return mean_val;
+        return sum / fractions.length;
     }
 
     // sample standard deviation of percolation threshold
     public double stddev() {
         double sum = 0;
+        double m = mean();
         for (double fraction : fractions) {
-            sum += Math.pow(mean_val - fraction, 2);
+            sum += Math.pow(m - fraction, 2);
         }
-        stddev_val = Math.pow(sum / (fractions.length - 1), 0.5);
-        return stddev_val;
+        return Math.pow(sum / (fractions.length - 1), 0.5);
     }
 
     // returns lower bound of the 95% confidence interval
     public double confidenceLo() {
-        return mean_val - 1.96 * stddev_val / Math.pow(fractions.length, 0.5);
+        double m = mean();
+        double dv = stddev();
+        return m - 1.96 * dv / Math.pow(fractions.length, 0.5);
     }
 
     // returns upper bound of the 95% confidence interval
     public double confidenceHi() {
-        return mean_val + 1.96 * stddev_val / Math.pow(fractions.length, 0.5);
+        double m = mean();
+        double dv = stddev();
+        return m + 1.96 * dv / Math.pow(fractions.length, 0.5);
     }
 
     // test client, described below
