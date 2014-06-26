@@ -63,7 +63,7 @@ public class Percolation {
                 int x = adj_sites[k][0];
                 int y = adj_sites[k][1];
                 // connect to valid and open neighbors
-                if (0 < x && x < num - 1 && 0 < y && y < num - 1 && sites[x][y] == 1) {
+                if (0 <= x && x <= num - 1 && 0 <= y && y <= num - 1 && sites[x][y] == 1) {
                     uf.union(xyton(i - 1, j - 1), xyton(x, y));
                 }
             }
