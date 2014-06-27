@@ -9,8 +9,7 @@ public class Percolation {
     private int vbott;
     private int num; // size
     private int[][] sites;
-    private WeightedQuickUnionUF uf;
-//    static int count = 0;
+    private WeightedQuickUnionUF uf, uf1;
 
     public Percolation(int N) {
         // create N-by-N grid, with all sites blocked
@@ -19,10 +18,12 @@ public class Percolation {
             throw new IllegalArgumentException();
         }
         num = N;
+        // FIXME
         vtop = num * num;
-        vbott = num * num + 1;
+//        vbott = num * num + 1;
         // The last two are virtual top and bottom sites.
         uf = new WeightedQuickUnionUF(num * num + 2);
+//        uf1 = new WeightedQuickUnionUF(num * num + 2);
         sites = new int[num][num];
         // initialize sites.
         for (int i = 0; i < num; i++) {
@@ -53,9 +54,9 @@ public class Percolation {
             if (i == 1) {
                 uf.union(vtop, xyton(i - 1, j - 1));
             }
-            if (i == num) {
-                uf.union(vbott, xyton(i - 1, j - 1));
-            }
+//            if (i == num) {
+//                uf1.union(vbott, xyton(i - 1, j - 1));
+//            }
             // adjacent open sites
             // normal coordiates, from 0 to N - 1.
             int in = i - 1;
@@ -69,6 +70,7 @@ public class Percolation {
                 if (0 <= x && x <= num - 1 && 0 <= y && y <= num - 1
                         && sites[x][y] == 1) {
                     uf.union(xyton(i - 1, j - 1), xyton(x, y));
+//                    uf1.union(xyton(i - 1, j - 1), xyton(x, y));
                 }
             }
         }
@@ -90,7 +92,14 @@ public class Percolation {
     public boolean percolates() {
         // does the system percolate?
         // whether the virtual top site is connected to the virtual bottom site.
-        return uf.connected(vtop, vbott);
+        // FIXME: always false: 100 != 101
+//        return uf.find(vtop) == uf1.find(vbott);
+        for (int i = num*(num -1); i < num*num; i++) {
+            if (uf.find(i) == uf.find(vtop)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static void main(String[] args) {
