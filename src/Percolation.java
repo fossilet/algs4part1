@@ -1,5 +1,5 @@
 /*
- Algorithms, Princeton Unviersity
+ Algorithms, Part 1, Week 1, Coursera
  http://coursera.cs.princeton.edu/algs4/assignments/percolation.html
  Jun 25 2014
  */
@@ -9,6 +9,7 @@ public class Percolation {
     private int vbott;
     private int num; // size
     private boolean[][] sites;
+    // uf1 is for solving backwash.
     private WeightedQuickUnionUF uf, uf1;
 
     public Percolation(int N) {
@@ -22,7 +23,8 @@ public class Percolation {
         vbott = num * num + 1;
         // The last two are virtual top and bottom sites.
         uf = new WeightedQuickUnionUF(num * num + 2);
-        uf1 = new WeightedQuickUnionUF(num * num + 2);
+        // Only use virtual top site.
+        uf1 = new WeightedQuickUnionUF(num * num + 1);
         sites = new boolean[num][num];
         // initialize sites.
         for (int i = 0; i < num; i++) {
@@ -65,14 +67,13 @@ public class Percolation {
                 }
             }
             // connect to respective virtual site if on top or bottom row.
+            // This tricky part learn from:
+            // https://github.com/agjacome/algs4part1-class
             if (i == 1) {
                 uf.union(vtop, xyton(i - 1, j - 1));
                 uf1.union(vtop, xyton(i - 1, j - 1));
             }
             if (i == num) {
-//            link to virtual bottom site --> percolate but backwash
-//            do not link to virtual bottom site --> do not backwash or
-//            percolate
                 uf.union(vbott, xyton(i - 1, j - 1));
             }
         }
@@ -88,13 +89,12 @@ public class Percolation {
         validateInd(i, j);
         // is site (row i, column j) full?
         // test if the site is connected with the virtual top site
-        return isOpen(i, j) && uf1.connected(vtop, xyton(i - 1, j - 1));
+        // This is the critical part I failed to conceive by myself.
+        return uf1.connected(vtop, xyton(i - 1, j - 1));
     }
 
     public boolean percolates() {
         // does the system percolate?
-        // whether the virtual top site is connected to the virtual bottom site.
-//        return uf.find(vtop) == uf.find(vbott);
         return uf.connected(vtop, vbott);
     }
 

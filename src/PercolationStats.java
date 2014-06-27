@@ -30,7 +30,6 @@ public class PercolationStats {
             if (!perc.isOpen(x, y)) {
                 perc.open(x, y);
             }
-//            System.out.printf("%d %d\n----\n", x, y);
         }
         // Calculate threshold.
         int openNum = 0;
