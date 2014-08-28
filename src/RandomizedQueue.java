@@ -7,28 +7,17 @@ import java.util.NoSuchElementException;
  */
 
 public class RandomizedQueue<Item> implements Iterable<Item> {
-    private int N;
-    private Node first;
-    private Node last;
-
-    // helper linked list class
-    private class Node {
-        private Item item;
-        private Node next;
-    }
+    private Item[] a;  // array of items
+    private int N;  // number of elements on stack
 
     // construct an empty randomized queue
     public RandomizedQueue() {
-        // FIXME: maybe I should use resizing array...
-        first = null;
-        last = null;
-        N = 0;
-        assert check();
+        a = (Item[]) new Object[2];
     }
 
     // is the queue empty?
     public boolean isEmpty() {
-        return first == null;
+        return N == 0;
     }
 
     // return the number of items on the queue
@@ -36,109 +25,73 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         return N;
     }
 
+    // resize the underlying array holding the elements
+    private void resize(int capacity) {
+        assert capacity >= N;
+        Item[] temp = (Item[]) new Object[capacity];
+        for (int i = 0; i < N; i++) {
+            temp[i] = a[i];
+        }
+        a = temp;
+    }
+
     // add the item
     public void enqueue(Item item) {
-        Node oldlast = last;
-        last = new Node();
-        last.item = item;
-        last.next = null;
-        if (isEmpty()) {
-            first = last;
-        } else {
-            oldlast.next = last;
-        }
-        N++;
-        assert check();
+        if (item == null) throw new NullPointerException("Null not allowed");
+        if (N == a.length)
+            resize(2 * a.length);  // double size of array if necessary
+        a[N++] = item;
     }
 
     // delete and return a random item
     public Item dequeue() {
-        if (isEmpty()) throw new NoSuchElementException("Queue underflow");
-        int num = StdRandom.uniform(size());  // 0 ~ N-1
-        if (num == 0 || num == N - 1) {
-            Item item = first.item;
-            first = first.next;
-            N--;
-            if (isEmpty()) last = null;  // to avoid loitering
-            assert check();
-            return item;
-        } else {
-            Node before = first;
-            for (int i = 0; i < num - 1; i++) {
-                before = before.next;
-            }
-            // dequeue
-            Node rm = before.next;
-            Node after = rm.next;
-            before.next = after;
-            rm.next = null;
-            N--;
-            assert check();
-            return rm.item;
-        }
+        if (isEmpty()) throw new NoSuchElementException("Queue underlow");
+        int num = StdRandom.uniform(N);
+        Item temp = a[num];
+        a[num] = a[N - 1];
+        a[N - 1] = null;
+        N--;
+        // shrink size of array if necessary
+        if (N > 0 && N == a.length / 4) resize(a.length / 2);
+        return temp;
     }
 
     // return (but do not delete) a random item
     public Item sample() {
         if (isEmpty()) throw new NoSuchElementException("Queue underflow");
         int num = StdRandom.uniform(size());  // 0 ~ N-1
-        Node ret = first;
-        for (int i = 0; i < num; i++) {
-            ret = ret.next;
-        }
-        return ret.item;
+        return a[num];
     }
 
     // over items in random order return an independent iterator
     public Iterator<Item> iterator() {
-        return new ListIterator();
+        return new RandomIterator();
     }
 
-    private class ListIterator implements Iterator<Item> {
-        private Node current = first;
+    private class RandomIterator implements Iterator<Item> {
+        private int i;
+        private int[] order = new int[N];
 
-        public boolean hasNext() { return current != null; }
-        public void remove() { throw new UnsupportedOperationException(); }
+        public RandomIterator() {
+            i = 0;
+            for (int j = 0; j < N; j++) {
+                order[j] = j;
+            }
+            StdRandom.shuffle(order);
+        }
 
-        // FIXME: not random
+        public boolean hasNext() {
+            return i < N;
+        }
+
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+
         public Item next() {
             if (!hasNext()) throw new NoSuchElementException();
-            Item item = current.item;
-            current = current.next;
-            return item;
+            return a[order[i++]];
         }
-    }
-
-    // check internal invariants
-    private boolean check() {
-        if (N == 0) {
-            if (first != null) return false;
-            if (last != null) return false;
-        } else if (N == 1) {
-            if (first == null || last == null) return false;
-            if (first != last) return false;
-            if (first.next != null) return false;
-        } else {
-            if (first == last) return false;
-            if (first.next == null) return false;
-            if (last.next != null) return false;
-
-            // check internal consistency of instance variable N
-            int numberOfNodes = 0;
-            for (Node x = first; x != null; x = x.next) {
-                numberOfNodes++;
-            }
-            if (numberOfNodes != N) return false;
-
-            // check internal consistency of instance variable last
-            Node lastNode = first;
-            while (lastNode.next != null) {
-                lastNode = lastNode.next;
-            }
-            if (last != lastNode) return false;
-        }
-
-        return true;
     }
 
     // unit testing
@@ -151,14 +104,17 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         rq.enqueue(5);
         rq.enqueue(6);
         int len = rq.size();
-        for (int i: rq) {
+        for (int i : rq) {
             StdOut.println(i);
         }
+        StdOut.println();
         for (int i = 0; i < len; i++) {
             StdOut.println(rq.sample());
         }
+        StdOut.println();
         for (int i = 0; i < len; i++) {
             StdOut.println(rq.dequeue());
         }
+        StdOut.println();
     }
 }

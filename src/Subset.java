@@ -5,11 +5,19 @@
 public class Subset {
     public static void main(String[] args) {
         int k = Integer.parseInt(args[0]);
-        StdOut.println(k);
+        // FIXME: does not meet bonus requirement:
+        // For an extra challenge, use only one Deque or RandomizedQueue object of
+        // maximum size at most k.
+        RandomizedQueue<String> rq = new RandomizedQueue<String>();
 
         String[] strs = StdIn.readAllStrings();
         for (String s: strs) {
-            StdOut.println(s);
+            rq.enqueue(s);
         }
+
+        for (int i = 0; i < k; i++) {
+            StdOut.println(rq.dequeue());
+        }
+
     }
 }
