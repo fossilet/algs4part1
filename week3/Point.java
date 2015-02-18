@@ -1,5 +1,7 @@
 import java.util.Comparator;
 
+import static java.lang.Math.abs;
+
 /**
  * http://coursera.cs.princeton.edu/algs4/assignments/collinear.html
  * Created by tux on 2014-09-29.
@@ -11,7 +13,7 @@ public class Point implements Comparable<Point> {
     // FIXME: http://stackoverflow.com/q/3984257/547578
     public final Comparator<Point> SLOPE_ORDER = new slopeOrder();
 
-    public class slopeOrder implements Comparator<Point> {
+    private class slopeOrder implements Comparator<Point> {
         public int compare(Point q, Point r) {
             if (slopeTo(q) > slopeTo(r)) {
                 return 1;
@@ -54,6 +56,8 @@ public class Point implements Comparable<Point> {
             } else {
                 return Double.NEGATIVE_INFINITY;
             }
+        } else if (this.y == that.y) {
+            return abs(((double) (that.y - this.y)) / (that.x - this.x));
         } else {
             return ((double) (that.y - this.y)) / (that.x - this.x);
         }
@@ -89,9 +93,12 @@ public class Point implements Comparable<Point> {
         Point q = new Point(1, 3);
         Point r = new Point(1, 2);
         Point s = new Point(4, 1);
+        Point p1 = new Point(490, 317);
+        Point q1 = new Point(68, 317);
 
         assert p.slopeTo(q) == Double.POSITIVE_INFINITY;
         assert p.slopeTo(r) == Double.NEGATIVE_INFINITY;
         assert p.slopeTo(s) == -1.0 / 3;
+        assert p1.slopeTo(q1) == +0;
     }
 }

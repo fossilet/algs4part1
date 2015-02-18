@@ -30,7 +30,6 @@ public class Brute {
                     for (int s = 0; s < r; s++) {
                         if (points[p].slopeTo(points[q]) == points[p].slopeTo(points[r]) &&
                                 points[p].slopeTo(points[r]) == points[p].slopeTo(points[s])) {
-                            // sort
                             Point[] dots = new Point[4];
                             dots[0] = points[p];
                             dots[1] = points[q];
@@ -38,7 +37,7 @@ public class Brute {
                             dots[3] = points[s];
                             Arrays.sort(dots);
                             // Print
-                            StdOut.printf("%s -> %s -> %s -> %s\n", dots);
+                            StdOut.printf("%s -> %s -> %s -> %s\n", (Object[])dots);
 
                             // TODO: OK?
                             dots[0].drawTo(dots[3]);
